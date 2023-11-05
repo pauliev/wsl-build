@@ -1,0 +1,45 @@
+#!/bin/bash
+STORAGE_DISTRO="wsl-build"
+STORAGE_PATH="$(wslpath $(wslvar USERPROFILE)\\.wsl\\${STORAGE_DISTRO})"
+STORAGE_FILE="home.tar.gz"
+STORAGE_LOCATION="${STORAGE_PATH}/${STORAGE_FILE}"  # Default storage location
+
+
+# Function to display help
+helpFunction()
+{
+   echo ""
+   echo "Usage: $0 --backup|--restore"
+   echo -e "\t--backup : Backs up specific files and directories in /home/developer to a .tar.gz file"
+   echo -e "\t--restore : Restores specific files and directories in /home/developer from a .tar.gz file"
+   exit 1 # Exit script after printing help
+}
+
+# Check if a parameter is provided
+if [ -z "$1" ]; then
+   echo "No parameter provided";
+   helpFunction
+fi
+
+# Define the storage location
+mkdir -p ${STORAGE_PATH}
+
+# Perform action based on parameter
+case $1 in
+   --backup)
+      echo "Backing up specific files and directories in /home/developer to $STORAGE_LOCATION"
+
+      # Backup specific files and directory from /home/developer
+      tar -czpf $STORAGE_LOCATION -C /home/developer .ssh .gitconfig .bash_aliases
+      ;;
+   --restore)
+      echo "Restoring specific files and directories in /home/developer from $STORAGE_LOCATION"
+      
+      # This will extract the specific files and directory to /home/developer
+      tar -xzpf $STORAGE_LOCATION -C /home/developer
+      ;;
+   *)
+      echo "Invalid parameter"
+      helpFunction
+      ;;
+esac
